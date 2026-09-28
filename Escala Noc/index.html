@@ -1,0 +1,2830 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Admin - Escala de Plantão</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      background: #eaf2ff;
+      color: #0f172a;
+    }
+
+    .bloqueado,
+    .oculto {
+      display: none !important;
+    }
+
+    .login-overlay {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1d4ed8, #60a5fa);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.25);
+      border: 1px solid #bfdbfe;
+    }
+
+    .login-card h2 {
+      margin: 0 0 8px;
+      color: #1d4ed8;
+      font-size: 24px;
+    }
+
+    .login-card p {
+      margin: 0 0 16px;
+      color: #475569;
+      font-size: 14px;
+    }
+
+    .login-card input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #93c5fd;
+      border-radius: 8px;
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    .login-card input:focus {
+      outline: 2px solid #2563eb;
+      border-color: #2563eb;
+    }
+
+    .login-card button {
+      width: 100%;
+    }
+
+    .senha-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .senha-wrap input {
+      padding-right: 48px;
+    }
+
+    .btn-olho {
+      position: absolute;
+      right: 8px;
+      top: 6px;
+      width: 34px !important;
+      height: 34px;
+      padding: 0;
+      border-radius: 8px;
+      background: #dbeafe;
+      color: #1e3a8a;
+      font-size: 15px;
+    }
+
+    .lembrar-senha {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 4px 0 14px;
+      color: #475569;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .lembrar-senha input {
+      width: auto !important;
+      margin: 0;
+    }
+
+    .erro-login {
+      margin-top: 12px;
+      color: #991b1b;
+      font-weight: 700;
+      font-size: 13px;
+      min-height: 18px;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 28px auto;
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(30, 64, 175, 0.16);
+      border: 1px solid #bfdbfe;
+    }
+
+    .topo {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      border-bottom: 2px solid #bfdbfe;
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+      align-items: flex-start;
+    }
+
+    .marca-topo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-viatec {
+      width: 92px;
+      max-height: 58px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 28px;
+      color: #1d4ed8;
+      line-height: 1.15;
+    }
+
+    .subtitulo {
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    button {
+      border: none;
+      padding: 10px 13px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .btn-primario {
+      background: #1d4ed8;
+      color: #ffffff;
+    }
+
+    .btn-secundario {
+      background: #dbeafe;
+      color: #1e3a8a;
+    }
+
+    .btn-publicar {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    .btn-verde {
+      background: #16a34a;
+      color: #ffffff;
+    }
+
+    .btn-perigo {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    button:hover {
+      filter: brightness(0.96);
+    }
+
+    .acoes-topo {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+      max-width: 760px;
+    }
+
+    .etapas {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .etapa {
+      border: 1px solid #bfdbfe;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 10px;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .etapa strong {
+      display: block;
+      color: #1e3a8a;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .etapa.ativa {
+      background: #eff6ff;
+      border-color: #2563eb;
+      box-shadow: inset 0 0 0 1px #2563eb;
+    }
+
+    .bloco {
+      border: 1px solid #bfdbfe;
+      border-radius: 14px;
+      background: #ffffff;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .bloco-destaque {
+      background: #eff6ff;
+    }
+
+    .bloco-topo {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .bloco-topo h2 {
+      margin: 0;
+      color: #1d4ed8;
+      font-size: 20px;
+    }
+
+    .bloco-topo p {
+      margin: 4px 0 0;
+      color: #475569;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .acoes-bloco {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .grid5,
+    .ferias-controle {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .grid5 {
+      grid-template-columns: repeat(5, 1fr);
+    }
+
+    .ferias-controle {
+      grid-template-columns: repeat(4, 1fr);
+      padding: 14px;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      background: #eff6ff;
+      align-items: end;
+    }
+
+    .campo label,
+    .ferias-controle label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .campo input,
+    .campo select,
+    .ferias-controle input,
+    .ferias-controle select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #93c5fd;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #ffffff;
+      color: #0f172a;
+    }
+
+    .campo input:focus,
+    .campo select:focus,
+    .ferias-controle input:focus,
+    .ferias-controle select:focus,
+    .pesquisa-area input:focus,
+    .obs textarea:focus {
+      outline: 2px solid #2563eb;
+      border-color: #2563eb;
+    }
+
+    .lista-ferias {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: -6px 0 16px;
+      font-size: 13px;
+    }
+
+    .ferias-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #dbeafe;
+      border: 1px solid #93c5fd;
+      color: #1e3a8a;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    .ferias-item button {
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: #93c5fd;
+      color: #1e3a8a;
+    }
+
+    .pesquisa-area {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin: 16px 0;
+      align-items: center;
+    }
+
+    .pesquisa-area input {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #93c5fd;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .resultado-pesquisa {
+      font-size: 13px;
+      color: #334155;
+      margin-top: -8px;
+      margin-bottom: 12px;
+    }
+
+    .status-salvamento {
+      font-size: 13px;
+      color: #1d4ed8;
+      margin: 8px 0 12px;
+      font-weight: 700;
+      display: none;
+    }
+
+    .status-salvamento.ativo {
+      display: block;
+    }
+
+    .aviso {
+      margin: 12px 0;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1e3a8a;
+      font-size: 14px;
+      display: none;
+      white-space: pre-line;
+    }
+
+    .aviso.ok {
+      display: block;
+      border-color: #93c5fd;
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .aviso.erro {
+      display: block;
+      border-color: #fecaca;
+      background: #fef2f2;
+      color: #991b1b;
+    }
+
+    .aviso.alerta {
+      display: block;
+      border-color: #fde68a;
+      background: #fffbeb;
+      color: #92400e;
+    }
+
+    .legenda {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 14px 0 18px;
+      font-size: 13px;
+      color: #334155;
+    }
+
+    .legenda-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cor {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      border: 1px solid #93c5fd;
+    }
+
+    .cor-util {
+      background: #ffffff;
+    }
+
+    .cor-sabado {
+      background: #fef3c7;
+    }
+
+    .cor-domingo {
+      background: #fee2e2;
+    }
+
+    .cor-ferias {
+      background: #dbeafe;
+    }
+
+    .cor-conflito {
+      background: #fecaca;
+    }
+
+    .tabela-wrapper {
+      overflow-x: auto;
+      border: 1px solid #93c5fd;
+      border-radius: 10px;
+    }
+
+    .tabela-wrapper.recolhida {
+      display: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    th,
+    td {
+      border: 1px solid #bfdbfe;
+      padding: 9px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    th {
+      background: #1d4ed8;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .celula-bloqueada {
+      background: #eff6ff;
+      color: #1e3a8a;
+      font-weight: 700;
+    }
+
+    td[contenteditable="true"] {
+      background: #ffffff;
+      min-width: 110px;
+    }
+
+    td[contenteditable="true"]:focus {
+      outline: 2px solid #2563eb;
+      background: #eff6ff;
+    }
+
+    select.colaborador {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #93c5fd;
+      border-radius: 6px;
+      background: #ffffff;
+      font-size: 14px;
+      color: #0f172a;
+    }
+
+    .domingo,
+    .feriado {
+      background: #fee2e2 !important;
+      color: #991b1b;
+      font-weight: 700;
+    }
+
+    .sabado {
+      background: #fef3c7 !important;
+      color: #92400e;
+      font-weight: 700;
+    }
+
+    .linha-oculta {
+      display: none;
+    }
+
+    .linha-encontrada {
+      outline: 2px solid #2563eb;
+      outline-offset: -2px;
+    }
+
+    .linha-proximo {
+      outline: 3px solid #2563eb;
+      outline-offset: -3px;
+    }
+
+    .linha-ferias {
+      outline: 3px solid #1d4ed8;
+      outline-offset: -3px;
+    }
+
+    .linha-conflito {
+      outline: 3px solid #dc2626;
+      outline-offset: -3px;
+      background: #fef2f2 !important;
+    }
+
+    .linha-conflito td {
+      background: #fef2f2;
+    }
+
+    .linha-conflito .domingo,
+    .linha-conflito .sabado {
+      background: #fef2f2 !important;
+    }
+
+    .whatsapp-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: #1d4ed8;
+      text-decoration: none;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .whatsapp-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #2563eb;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .resumo,
+    .historico,
+    .finalizacao {
+      margin-top: 20px;
+      border: 1px solid #bfdbfe;
+      border-radius: 14px;
+      padding: 16px;
+      background: #eff6ff;
+    }
+
+    .resumo-topo,
+    .historico-topo,
+    .finalizacao-topo {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .resumo-topo h2,
+    .historico-topo h2,
+    .finalizacao-topo h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #1d4ed8;
+    }
+
+    .resumo-topo p,
+    .historico-topo p,
+    .finalizacao-topo p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.35;
+    }
+
+    .dashboard-geral {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .card-geral {
+      background: #ffffff;
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .card-geral small {
+      display: block;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .card-geral strong {
+      display: block;
+      font-size: 24px;
+      color: #1d4ed8;
+    }
+
+    .subtitulo-resumo {
+      margin: 14px 0 10px;
+      color: #1e3a8a;
+      font-size: 15px;
+    }
+
+    .dashboard-colaboradores {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    .card-colaborador {
+      background: #ffffff;
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .card-colaborador .nome {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .card-colaborador .nome strong {
+      color: #1e3a8a;
+      font-size: 15px;
+    }
+
+    .card-colaborador .total {
+      background: #dbeafe;
+      color: #1d4ed8;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .linha-metrica {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 0;
+      border-top: 1px solid #e2e8f0;
+      font-size: 13px;
+    }
+
+    .linha-metrica span {
+      color: #475569;
+    }
+
+    .linha-metrica strong {
+      color: #0f172a;
+    }
+
+    .barra-distribuicao {
+      display: flex;
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      margin-top: 10px;
+      background: #e2e8f0;
+    }
+
+    .barra-util {
+      background: #2563eb;
+    }
+
+    .barra-fds {
+      background: #f59e0b;
+    }
+
+    .barra-feriado {
+      background: #dc2626;
+    }
+
+    .historico-lista {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .historico-card {
+      background: #ffffff;
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .historico-info strong {
+      display: block;
+      color: #1e3a8a;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .historico-info span {
+      display: block;
+      color: #64748b;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .historico-acoes {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .vazio {
+      padding: 14px;
+      border: 1px dashed #93c5fd;
+      border-radius: 12px;
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .obs {
+      margin-top: 20px;
+    }
+
+    .obs label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #1e3a8a;
+    }
+
+    .obs textarea {
+      width: 100%;
+      min-height: 90px;
+      resize: vertical;
+      border: 1px solid #93c5fd;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 14px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .nota {
+      font-size: 13px;
+      color: #475569;
+      margin: 8px 0 16px;
+      line-height: 1.35;
+    }
+
+    .caixa-ajuda-final {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .ajuda-final {
+      background: #ffffff;
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.35;
+    }
+
+    .ajuda-final strong {
+      display: block;
+      color: #1e3a8a;
+      margin-bottom: 4px;
+    }
+
+    .cabecalho-pdf {
+      display: none;
+    }
+
+    @media (max-width: 1050px) {
+      .etapas,
+      .dashboard-geral,
+      .dashboard-colaboradores,
+      .historico-lista,
+      .caixa-ajuda-final {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .topo {
+        flex-direction: column;
+      }
+
+      .acoes-topo {
+        justify-content: flex-start;
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 850px) {
+      .grid5,
+      .ferias-controle,
+      .pesquisa-area,
+      .dashboard-geral,
+      .dashboard-colaboradores,
+      .historico-lista,
+      .etapas,
+      .caixa-ajuda-final {
+        grid-template-columns: 1fr;
+      }
+
+      .bloco-topo,
+      .resumo-topo,
+      .historico-topo,
+      .finalizacao-topo {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .acoes-bloco,
+      .historico-acoes,
+      .acoes-topo {
+        flex-direction: column;
+      }
+
+      .acoes-topo button,
+      .acoes-bloco button,
+      .historico-acoes button {
+        width: 100%;
+      }
+
+      .historico-card {
+        flex-direction: column;
+      }
+
+      .marca-topo {
+        align-items: flex-start;
+      }
+
+      .logo-viatec {
+        width: 76px;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+
+      .container {
+        margin: 0;
+        border-radius: 0;
+      }
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+      }
+
+      .login-overlay,
+      .topo,
+      .etapas,
+      #painelConfiguracao,
+      .historico,
+      .finalizacao,
+      .acoes-bloco,
+      .pesquisa-area,
+      .resultado-pesquisa,
+      .legenda,
+      .status-salvamento,
+      .aviso {
+        display: none !important;
+      }
+
+      .container {
+        margin: 0;
+        max-width: none;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+      }
+
+      #painelTabela {
+        display: block !important;
+      }
+
+      .cabecalho-pdf {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 2px solid #1d4ed8;
+        padding-bottom: 8px;
+        margin-bottom: 10px;
+      }
+
+      .cabecalho-pdf img {
+        width: 95px;
+        max-height: 55px;
+        object-fit: contain;
+      }
+
+      .cabecalho-pdf h2 {
+        margin: 0;
+        color: #1d4ed8;
+        font-size: 18px;
+      }
+
+      .cabecalho-pdf p {
+        margin: 3px 0 0;
+        font-size: 11px;
+        color: #334155;
+      }
+
+      .bloco,
+      .resumo {
+        border: none;
+        background: #ffffff;
+        padding: 0;
+        margin: 0 0 12px;
+      }
+
+      .bloco-topo {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .bloco-topo h2 {
+        display: none;
+      }
+
+      .bloco-topo p {
+        display: none;
+      }
+
+      .tabela-wrapper {
+        overflow: visible;
+        border: none;
+      }
+
+      table {
+        min-width: 0;
+        width: 100%;
+      }
+
+      th,
+      td {
+        font-size: 10px;
+        padding: 5px;
+      }
+
+      .whatsapp-icon {
+        display: none;
+      }
+
+      .whatsapp-link {
+        color: #000000;
+        font-weight: 700;
+      }
+
+      .obs {
+        margin-top: 10px;
+      }
+
+      .obs textarea {
+        border: none;
+        min-height: auto;
+        font-size: 11px;
+        padding: 0;
+      }
+
+      .resumo {
+        page-break-inside: avoid;
+      }
+
+      .resumo-topo h2 {
+        font-size: 14px;
+      }
+
+      .resumo-topo p {
+        display: none;
+      }
+
+      .dashboard-geral,
+      .dashboard-colaboradores {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 5px;
+      }
+
+      .card-geral,
+      .card-colaborador {
+        padding: 6px;
+      }
+
+      .card-geral strong {
+        font-size: 16px;
+      }
+
+      .card-geral small,
+      .linha-metrica {
+        font-size: 10px;
+      }
+
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="telaLogin" class="login-overlay">
+    <div class="login-card">
+      <h2>Acesso Admin</h2>
+      <p>Informe a senha para acessar a tela administrativa.</p>
+
+      <div class="senha-wrap">
+        <input id="senhaAdmin" type="password" placeholder="Digite a senha" autocomplete="current-password" />
+        <button id="btnMostrarSenha" class="btn-olho" type="button" title="Mostrar senha">👁️</button>
+      </div>
+
+      <label class="lembrar-senha">
+        <input id="salvarSenhaAdmin" type="checkbox">
+        Salvar senha neste navegador
+      </label>
+
+      <button id="btnEntrarAdmin" class="btn-primario" type="button">Entrar</button>
+      <div id="erroLogin" class="erro-login"></div>
+    </div>
+  </div>
+
+  <div id="conteudoAdmin" class="container bloqueado">
+    <div class="topo">
+      <div class="marca-topo">
+        <img class="logo-viatec" src="logo-viatec.png" alt="Logo ViaTec">
+        <div>
+          <h1 contenteditable="true" id="tituloPagina">Admin - Escala de Plantão</h1>
+          <div class="subtitulo">Fluxo guiado: iniciar, configurar, gerar, conferir e salvar.</div>
+        </div>
+      </div>
+
+      <div class="acoes-topo">
+        <button id="btnNovaEscala" class="btn-primario" type="button">Iniciar nova escala</button>
+        <button id="btnHistorico" class="btn-secundario" type="button">Atualizar histórico</button>
+        <button id="btnCarregar" class="btn-secundario" type="button">Carregar rascunho</button>
+        <button id="btnCarregarAtual" class="btn-secundario" type="button">Carregar atual manual</button>
+      </div>
+    </div>
+
+    <div class="etapas">
+      <div id="etapa1" class="etapa ativa">
+        <strong>1. Iniciar</strong>
+        Comece uma nova escala.
+      </div>
+
+      <div id="etapa2" class="etapa">
+        <strong>2. Configurar</strong>
+        Informe mês, ano, setor e férias.
+      </div>
+
+      <div id="etapa3" class="etapa">
+        <strong>3. Gerar</strong>
+        Crie a tabela do mês.
+      </div>
+
+      <div id="etapa4" class="etapa">
+        <strong>4. Conferir</strong>
+        Ajuste plantonistas e feriados.
+      </div>
+
+      <div id="etapa5" class="etapa">
+        <strong>5. Salvar</strong>
+        Grave a escala no Supabase.
+      </div>
+    </div>
+
+    <input id="escalaId" type="hidden">
+
+    <div id="statusSalvamento" class="status-salvamento">Alterações salvas automaticamente.</div>
+    <div id="aviso" class="aviso"></div>
+
+    <div id="painelConfiguracao" class="bloco bloco-destaque oculto">
+      <div class="bloco-topo">
+        <div>
+          <h2>Configuração da escala</h2>
+          <p>Configure o mês, ano, setor, telefone e férias antes de gerar a tabela.</p>
+        </div>
+
+        <div class="acoes-bloco">
+          <button id="btnGerar" class="btn-primario" type="button">Gerar tabela da escala</button>
+        </div>
+      </div>
+
+      <div class="grid5">
+        <div class="campo">
+          <label>Nome da escala</label>
+          <input id="nomeEscala" type="text" value="Escala NOC">
+        </div>
+
+        <div class="campo">
+          <label>Mês</label>
+          <select id="mes"></select>
+        </div>
+
+        <div class="campo">
+          <label>Ano</label>
+          <input id="ano" type="number" value="2026">
+        </div>
+
+        <div class="campo">
+          <label>Setor</label>
+          <input id="setor" type="text" value="NOC">
+        </div>
+
+        <div class="campo">
+          <label>Telefone NOC</label>
+          <input id="telefone" type="text" value="98449-1917">
+        </div>
+      </div>
+
+      <div class="nota">
+        Ao clicar em <strong>Gerar tabela da escala</strong>, os feriados nacionais do mês serão marcados automaticamente.
+        Para feriados municipais, depois marque manualmente a coluna <strong>Feriado?</strong> na tabela.
+      </div>
+
+      <div class="ferias-controle">
+        <div>
+          <label>Colaborador em férias</label>
+          <select id="feriasColaborador"></select>
+        </div>
+
+        <div>
+          <label>Início</label>
+          <input id="feriasInicio" type="date">
+        </div>
+
+        <div>
+          <label>Fim</label>
+          <input id="feriasFim" type="date">
+        </div>
+
+        <button id="btnAdicionarFerias" class="btn-secundario" type="button">Adicionar férias</button>
+      </div>
+
+      <div id="listaFerias" class="lista-ferias"></div>
+    </div>
+
+    <div id="painelTabela" class="oculto">
+      <div class="cabecalho-pdf">
+        <img src="logo-viatec.png" alt="Logo ViaTec">
+        <div>
+          <h2 id="tituloPdf">Escala de Plantão</h2>
+          <p id="subtituloPdf">ViaTec Telecom</p>
+        </div>
+      </div>
+
+      <div class="bloco">
+        <div class="bloco-topo">
+          <div>
+            <h2>Conferência da escala</h2>
+            <p>Revise a tabela, ajuste plantonistas, marque feriados municipais e verifique possíveis conflitos.</p>
+          </div>
+
+          <div class="acoes-bloco">
+            <button id="btnFeriados" class="btn-secundario" type="button">Buscar feriados</button>
+            <button id="btnVerificar" class="btn-secundario" type="button">Verificar problemas</button>
+            <button id="btnProximo" class="btn-secundario" type="button">Próximo plantão</button>
+            <button id="btnAlternarTabela" class="btn-secundario" type="button">Minimizar tabela</button>
+          </div>
+        </div>
+
+        <div class="pesquisa-area">
+          <input id="pesquisa" type="text" placeholder="Pesquisar por data, nome, dia, horário ou observação...">
+          <button id="btnLimparPesquisa" class="btn-secundario" type="button">Limpar pesquisa</button>
+        </div>
+
+        <div id="resultadoPesquisa" class="resultado-pesquisa">Digite algo para localizar um plantão.</div>
+
+        <div class="legenda">
+          <div class="legenda-item"><span class="cor cor-util"></span> Dia útil</div>
+          <div class="legenda-item"><span class="cor cor-sabado"></span> Sábado</div>
+          <div class="legenda-item"><span class="cor cor-domingo"></span> Domingo/Feriado</div>
+          <div class="legenda-item"><span class="cor cor-ferias"></span> Férias</div>
+          <div class="legenda-item"><span class="cor cor-conflito"></span> Problema/conflito</div>
+        </div>
+
+        <div id="tabelaWrapper" class="tabela-wrapper">
+          <table id="tabela">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Semana</th>
+                <th>Feriado?</th>
+                <th>Plantonista</th>
+                <th>Horário</th>
+                <th>Telefone</th>
+                <th>Observação</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="obs">
+          <label>Observações gerais</label>
+          <textarea id="observacoes">REGRAS DE ESCALA:
+Segunda a sexta: 17:45 às 21:50
+Sábado: 12:00 às 19:00
+Domingo e feriados: 08:00 às 19:00
+João: fixo em todas as segundas-feiras, salvo férias.
+Regra automática: ao gerar a escala, João entra preferencialmente nas segundas, finais de semana e feriados.
+Ajuste manual: se necessário, o administrador pode colocar João em outro dia manualmente.</textarea>
+        </div>
+      </div>
+
+      <div class="resumo">
+        <div class="resumo-topo">
+          <div>
+            <h2>Dashboard da escala</h2>
+            <p>Distribuição dos plantões por colaborador e tipo de dia.</p>
+          </div>
+
+          <button id="btnResumo" class="btn-secundario" type="button">Atualizar resumo</button>
+        </div>
+
+        <div class="dashboard-geral" id="dashboardGeral"></div>
+
+        <h3 class="subtitulo-resumo">Plantões por colaborador</h3>
+        <div class="dashboard-colaboradores" id="resumo"></div>
+      </div>
+
+      <div class="finalizacao">
+        <div class="finalizacao-topo">
+          <div>
+            <h2>Finalizar escala</h2>
+            <p>Depois de conferir tudo, salve a escala do mês no Supabase.</p>
+          </div>
+
+          <div class="acoes-bloco">
+            <button id="btnSalvarMes" class="btn-publicar" type="button">Salvar escala do mês</button>
+            <button id="btnPublicarAtual" class="btn-verde" type="button">Forçar como atual agora</button>
+            <button id="btnBaixarPdf" class="btn-secundario" type="button">Baixar PDF</button>
+            <button id="btnExportarCsv" class="btn-secundario" type="button">Exportar CSV</button>
+            <button id="btnLimpar" class="btn-secundario" type="button">Limpar tela</button>
+            <button id="btnDespublicar" class="btn-perigo" type="button">Remover atual manual</button>
+          </div>
+        </div>
+
+        <div class="caixa-ajuda-final">
+          <div class="ajuda-final">
+            <strong>Salvar escala do mês</strong>
+            Grava como <strong>setor-ANO-MM</strong>. Exemplo: <strong>noc-2026-06</strong>.
+            Essa escala aparecerá automaticamente no user.html quando chegar o mês.
+          </div>
+
+          <div class="ajuda-final">
+            <strong>Forçar como atual agora</strong>
+            Também grava como <strong>setor-atual</strong>. Use somente se precisar mostrar a escala imediatamente aos plantonistas.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="historico">
+      <div class="historico-topo">
+        <div>
+          <h2>Histórico de escalas salvas</h2>
+          <p>Abra escalas antigas, edite e salve novamente. A escala só aparece para os plantonistas quando chegar o mês correspondente.</p>
+        </div>
+
+        <button id="btnAtualizarHistorico2" class="btn-secundario" type="button">Atualizar histórico</button>
+      </div>
+
+      <div id="historicoLista" class="historico-lista">
+        <div class="vazio">Carregando histórico...</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const SUPABASE_URL = "https://zvhvxkwxrinflonpxzmp.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_4RJB6lPQupdRhD94p2rOZA_KALCaBUZ";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    (() => {
+      'use strict';
+
+      const SENHA_ADMIN = 'noc@2026';
+      const LOGIN_KEY = 'adminNocAutenticado';
+      const SENHA_SALVA_KEY = 'senhaAdminNocSalva';
+
+      const colaboradores = ['André', 'Bruno', 'Emanuel', 'Guilherme', 'João', 'Ricardo'];
+      const colaboradoresSemana = ['André', 'Bruno', 'Emanuel', 'Guilherme', 'Ricardo'];
+      const colaboradoresFimSemana = ['André', 'Bruno', 'Emanuel', 'Guilherme', 'João', 'Ricardo'];
+      const nomesSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+      const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+      const STORAGE_KEY = 'escalaPlantaoAdmin';
+
+      let ferias = [];
+      let timerSalvamento = null;
+
+      const $ = (id) => document.getElementById(id);
+      const bodyTabela = () => document.querySelector('#tabela tbody');
+
+      function liberarAdmin() {
+        $('telaLogin').style.display = 'none';
+        $('conteudoAdmin').classList.remove('bloqueado');
+      }
+
+      function verificarLoginSalvo() {
+        const autenticado = sessionStorage.getItem(LOGIN_KEY);
+
+        if (autenticado === 'sim') {
+          liberarAdmin();
+        }
+      }
+
+      function carregarSenhaSalva() {
+        const senhaSalva = localStorage.getItem(SENHA_SALVA_KEY);
+
+        if (senhaSalva) {
+          $('senhaAdmin').value = senhaSalva;
+          $('salvarSenhaAdmin').checked = true;
+        }
+      }
+
+      function alternarMostrarSenha() {
+        const input = $('senhaAdmin');
+        const botao = $('btnMostrarSenha');
+
+        if (input.type === 'password') {
+          input.type = 'text';
+          botao.innerText = '🙈';
+          botao.title = 'Ocultar senha';
+        } else {
+          input.type = 'password';
+          botao.innerText = '👁️';
+          botao.title = 'Mostrar senha';
+        }
+      }
+
+      function entrarAdmin() {
+        const senha = $('senhaAdmin').value;
+        const salvarSenha = $('salvarSenhaAdmin').checked;
+
+        if (senha === SENHA_ADMIN) {
+          sessionStorage.setItem(LOGIN_KEY, 'sim');
+
+          if (salvarSenha) {
+            localStorage.setItem(SENHA_SALVA_KEY, senha);
+          } else {
+            localStorage.removeItem(SENHA_SALVA_KEY);
+          }
+
+          liberarAdmin();
+          carregarHistorico();
+          return;
+        }
+
+        $('erroLogin').innerText = 'Senha incorreta.';
+
+        if (!salvarSenha) {
+          $('senhaAdmin').value = '';
+        }
+
+        $('senhaAdmin').focus();
+      }
+
+      function escapeHtml(valor) {
+        return String(valor ?? '')
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;');
+      }
+
+      function textoParaId(valor) {
+        return String(valor || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '') || 'setor';
+      }
+
+      function telefoneNoc() {
+        return $('telefone').value.trim() || '98449-1917';
+      }
+
+      function whatsappNoc() {
+        const numeros = telefoneNoc().replace(/\D/g, '');
+        const numeroCompleto = numeros.startsWith('55') ? numeros : '5555' + numeros;
+        return 'https://wa.me/' + numeroCompleto;
+      }
+
+      function telefoneHtml() {
+        return `<a class="whatsapp-link" href="${whatsappNoc()}" target="_blank"><span class="whatsapp-icon">☎</span>${escapeHtml(telefoneNoc())}</a>`;
+      }
+
+      function dataBR(dia, mes, ano) {
+        return `${String(dia).padStart(2, '0')}/${String(mes + 1).padStart(2, '0')}/${ano}`;
+      }
+
+      function dataBrParaIso(data) {
+        const p = String(data).split('/');
+        return p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : '';
+      }
+
+      function dataIsoParaBr(data) {
+        const p = String(data).split('-');
+        return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : data;
+      }
+
+      function dataBrParaDate(data) {
+        const p = String(data).split('/');
+        if (p.length !== 3) return null;
+
+        const d = Number(p[0]);
+        const m = Number(p[1]) - 1;
+        const a = Number(p[2]);
+
+        if (Number.isNaN(d) || Number.isNaN(m) || Number.isNaN(a)) return null;
+
+        return new Date(a, m, d);
+      }
+
+      function feriasNoDia(nome, dataBr) {
+        const iso = dataBrParaIso(dataBr);
+
+        if (!nome || !iso) return null;
+
+        return ferias.find((f) => f.nome === nome && iso >= f.inicio && iso <= f.fim) || null;
+      }
+
+      function horarioPorDia(diaSemana, feriado) {
+        if (feriado || diaSemana === 0) return '08:00 às 19:00';
+        if (diaSemana === 6) return '12:00 às 19:00';
+        return '17:45 às 21:50';
+      }
+
+      function classeDia(diaSemana, feriado) {
+        if (feriado || diaSemana === 0) return 'domingo';
+        if (diaSemana === 6) return 'sabado';
+        return '';
+      }
+
+      function diaSemanaDaLinha(linha) {
+        return nomesSemana.indexOf(linha.cells[1]?.innerText.trim() || '');
+      }
+
+      function aplicarClasse(linha, diaSemana, feriado) {
+        linha.classList.remove('sabado', 'domingo', 'feriado');
+
+        const classe = classeDia(diaSemana, feriado);
+        if (classe) linha.classList.add(classe);
+      }
+
+      function criarSelect(nomeSelecionado = '') {
+        return `<select class="colaborador">
+          <option value="">Selecione</option>
+          ${colaboradores.map((nome) => `<option value="${escapeHtml(nome)}" ${nome === nomeSelecionado ? 'selected' : ''}>${escapeHtml(nome)}</option>`).join('')}
+        </select>`;
+      }
+
+      function nomeEscalaPadrao() {
+        const mes = meses[Number($('mes').value)] || '';
+        const ano = $('ano').value || '';
+        const setor = $('setor').value.trim() || 'NOC';
+
+        return `Escala ${setor} - ${mes}/${ano}`;
+      }
+
+      function garantirNomeEscala() {
+        const nomeAtual = $('nomeEscala').value.trim();
+
+        if (nomeAtual) return nomeAtual;
+
+        const nome = nomeEscalaPadrao();
+        $('nomeEscala').value = nome;
+
+        return nome;
+      }
+
+      function gerarIdEscalaMensal(dados) {
+        const ano = dados.ano;
+        const mes = String(Number(dados.mesNumero) + 1).padStart(2, '0');
+        const setorId = textoParaId(dados.setor || 'NOC');
+
+        return `${setorId}-${ano}-${mes}`;
+      }
+
+      function gerarIdEscalaAtual(dados) {
+        const setorId = textoParaId(dados.setor || 'NOC');
+        return `${setorId}-atual`;
+      }
+
+      function atualizarEtapas(etapa) {
+        ['etapa1', 'etapa2', 'etapa3', 'etapa4', 'etapa5'].forEach((id, index) => {
+          $(id).classList.toggle('ativa', index + 1 <= etapa);
+        });
+      }
+
+      function mostrarConfiguracao() {
+        $('painelConfiguracao').classList.remove('oculto');
+        atualizarEtapas(2);
+      }
+
+      function mostrarTabela() {
+        $('painelConfiguracao').classList.remove('oculto');
+        $('painelTabela').classList.remove('oculto');
+        atualizarEtapas(5);
+      }
+
+      function atualizarCabecalhoPdf() {
+        const dados = montarDadosEscala();
+
+        $('tituloPdf').innerText = dados.nomeEscala || 'Escala de Plantão';
+        $('subtituloPdf').innerText = `${dados.setor} - ${dados.mes}/${dados.ano}`;
+      }
+
+      function escolherPlantonista(diaSemana, dataBr, contagem, ultimoPorSemana, ultimoPlantonista, feriado) {
+        const nomeDia = nomesSemana[diaSemana];
+
+        if (diaSemana === 1 && ultimoPlantonista !== 'João' && !feriasNoDia('João', dataBr)) {
+          contagem.João = (contagem.João || 0) + 1;
+          ultimoPorSemana[nomeDia] = 'João';
+          return 'João';
+        }
+
+        let permitidos = (feriado || diaSemana === 6) ? colaboradoresFimSemana.slice() : colaboradoresSemana.slice();
+
+        if (diaSemana === 0) {
+          permitidos = colaboradoresSemana.slice();
+        }
+
+        permitidos = permitidos.filter((nome) => nome !== ultimoPlantonista && !feriasNoDia(nome, dataBr));
+
+        if (!permitidos.length) {
+          permitidos = colaboradores.filter((nome) => nome !== ultimoPlantonista && !feriasNoDia(nome, dataBr));
+        }
+
+        if (!permitidos.length) return '';
+
+        permitidos.sort((a, b) => {
+          const pa = (contagem[a] || 0) + (ultimoPorSemana[nomeDia] === a ? 2 : 0);
+          const pb = (contagem[b] || 0) + (ultimoPorSemana[nomeDia] === b ? 2 : 0);
+          return pa - pb;
+        });
+
+        const escolhido = permitidos[0];
+
+        contagem[escolhido] = (contagem[escolhido] || 0) + 1;
+        ultimoPorSemana[nomeDia] = escolhido;
+
+        return escolhido;
+      }
+
+      function montarLinha(item) {
+        const linha = bodyTabela().insertRow();
+
+        const data = item.data || '';
+        const semana = item.semana || '';
+        const feriado = !!item.feriado;
+        const plantonista = item.plantonista || '';
+        const diaSemana = nomesSemana.indexOf(semana);
+
+        linha.innerHTML = `
+          <td class="celula-bloqueada">${escapeHtml(data)}</td>
+          <td class="celula-bloqueada">${escapeHtml(semana)}</td>
+          <td><input type="checkbox" class="check-feriado" ${feriado ? 'checked' : ''}></td>
+          <td>${criarSelect(plantonista)}</td>
+          <td contenteditable="true">${escapeHtml(item.horario || '')}</td>
+          <td>${telefoneHtml()}</td>
+          <td contenteditable="true">${escapeHtml(item.observacao || '')}</td>
+        `;
+
+        aplicarClasse(linha, diaSemana, feriado);
+      }
+
+      function novaEscala() {
+        const temTabela = bodyTabela().rows.length > 0;
+
+        if (temTabela) {
+          const confirmar = confirm(
+            'Deseja iniciar uma nova escala?\n\nA tabela atual da tela será limpa, mas as escalas já salvas no Supabase continuarão no histórico.'
+          );
+
+          if (!confirmar) return;
+        }
+
+        $('escalaId').value = '';
+        $('nomeEscala').value = nomeEscalaPadrao();
+
+        bodyTabela().innerHTML = '';
+        $('painelTabela').classList.add('oculto');
+
+        atualizarTudo();
+        limparAviso();
+        salvarAutomatico();
+        mostrarConfiguracao();
+
+        alert('Nova escala iniciada. Configure mês, ano, setor, telefone e férias. Depois clique em Gerar tabela da escala.');
+      }
+
+      async function gerarEscala() {
+        if (bodyTabela().rows.length) {
+          const confirmar = confirm('Gerar uma nova tabela vai limpar somente a tabela atual da tela. O histórico salvo no Supabase não será apagado. Deseja continuar?');
+          if (!confirmar) return;
+        }
+
+        if (!$('nomeEscala').value.trim()) {
+          $('nomeEscala').value = nomeEscalaPadrao();
+        }
+
+        const mes = Number($('mes').value);
+        const ano = Number($('ano').value);
+        const totalDias = new Date(ano, mes + 1, 0).getDate();
+
+        bodyTabela().innerHTML = '';
+
+        const contagem = {};
+        const ultimoPorSemana = {};
+        let ultimoPlantonista = '';
+
+        for (let dia = 1; dia <= totalDias; dia++) {
+          const dataObj = new Date(ano, mes, dia);
+          const diaSemana = dataObj.getDay();
+          const data = dataBR(dia, mes, ano);
+          const feriado = false;
+          const plantonista = escolherPlantonista(diaSemana, data, contagem, ultimoPorSemana, ultimoPlantonista, feriado);
+
+          montarLinha({
+            data,
+            semana: nomesSemana[diaSemana],
+            feriado,
+            plantonista,
+            horario: horarioPorDia(diaSemana, feriado),
+            observacao: plantonista ? '' : 'Sem colaborador disponível por férias'
+          });
+
+          ultimoPlantonista = plantonista;
+        }
+
+        await buscarFeriadosNacionais(false);
+
+        mostrarTabela();
+        atualizarTudo();
+        atualizarCabecalhoPdf();
+        limparAviso();
+        salvarAutomatico();
+
+        window.scrollTo({
+          top: $('painelTabela').offsetTop - 20,
+          behavior: 'smooth'
+        });
+      }
+
+      function adicionarTextoObservacao(linha, texto) {
+        const obs = linha.cells[6];
+        const atual = obs.innerText.trim();
+
+        if (atual.includes(texto)) return;
+
+        obs.innerText = atual ? `${atual} | ${texto}` : texto;
+      }
+
+      function removerObservacaoPorPrefixo(linha, prefixo) {
+        const obs = linha.cells[6];
+        const partes = obs.innerText
+          .split('|')
+          .map((parte) => parte.trim())
+          .filter((parte) => parte && !parte.startsWith(prefixo));
+
+        obs.innerText = partes.join(' | ');
+      }
+
+      async function buscarFeriadosNacionais(mostrarAlerta = true) {
+        const ano = $('ano').value;
+        const mesSelecionado = Number($('mes').value) + 1;
+
+        if (!bodyTabela().rows.length) {
+          if (mostrarAlerta) {
+            alert('Gere a tabela da escala antes de buscar os feriados.');
+          }
+
+          return;
+        }
+
+        try {
+          const resposta = await fetch(`https://brasilapi.com.br/api/feriados/v1/${ano}`);
+
+          if (!resposta.ok) throw new Error('Falha na consulta');
+
+          const feriados = await resposta.json();
+          let marcados = 0;
+
+          feriados.forEach((feriado) => {
+            const partes = String(feriado.date).split('-');
+
+            if (partes.length !== 3 || Number(partes[1]) !== mesSelecionado) return;
+
+            const data = `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+            document.querySelectorAll('#tabela tbody tr').forEach((linha) => {
+              if ((linha.cells[0]?.innerText.trim() || '') === data) {
+                const checkbox = linha.querySelector('.check-feriado');
+                checkbox.checked = true;
+
+                alternarFeriado(checkbox, 'automatico');
+
+                const texto = `Feriado nacional: ${feriado.name || 'Feriado'}`;
+                adicionarTextoObservacao(linha, texto);
+
+                marcados++;
+              }
+            });
+          });
+
+          atualizarTudo();
+          atualizarCabecalhoPdf();
+          limparAviso();
+          salvarAutomatico();
+
+          if (mostrarAlerta) {
+            alert(marcados ? `${marcados} feriado(s) nacional(is) marcado(s).` : 'Nenhum feriado nacional neste mês.');
+          }
+        } catch {
+          if (mostrarAlerta) {
+            alert('Não foi possível buscar os feriados. Verifique a internet ou marque manualmente.');
+          } else {
+            aviso('A escala foi gerada, mas não foi possível buscar os feriados nacionais automaticamente. Verifique a internet ou marque manualmente.', 'erro');
+          }
+        }
+      }
+
+      function atualizarResumo() {
+        const resumo = {};
+        const geral = {
+          total: 0,
+          uteis: 0,
+          finaisSemana: 0,
+          feriados: 0,
+          semPlantonista: 0
+        };
+
+        colaboradores.forEach((nome) => {
+          resumo[nome] = {
+            total: 0,
+            uteis: 0,
+            finaisSemana: 0,
+            feriados: 0
+          };
+        });
+
+        document.querySelectorAll('#tabela tbody tr').forEach((linha) => {
+          const semana = linha.cells[1]?.innerText.trim() || '';
+          const plantonista = linha.querySelector('select.colaborador')?.value || '';
+          const feriado = !!linha.querySelector('.check-feriado')?.checked;
+          const ehFimSemana = semana === 'Sábado' || semana === 'Domingo';
+
+          geral.total++;
+
+          if (feriado) {
+            geral.feriados++;
+          } else if (ehFimSemana) {
+            geral.finaisSemana++;
+          } else {
+            geral.uteis++;
+          }
+
+          if (!plantonista) {
+            geral.semPlantonista++;
+            return;
+          }
+
+          if (!resumo[plantonista]) {
+            resumo[plantonista] = {
+              total: 0,
+              uteis: 0,
+              finaisSemana: 0,
+              feriados: 0
+            };
+          }
+
+          resumo[plantonista].total++;
+
+          if (feriado) {
+            resumo[plantonista].feriados++;
+          } else if (ehFimSemana) {
+            resumo[plantonista].finaisSemana++;
+          } else {
+            resumo[plantonista].uteis++;
+          }
+        });
+
+        $('dashboardGeral').innerHTML = `
+          <div class="card-geral"><small>Total de dias</small><strong>${geral.total}</strong></div>
+          <div class="card-geral"><small>Dias úteis</small><strong>${geral.uteis}</strong></div>
+          <div class="card-geral"><small>Finais de semana</small><strong>${geral.finaisSemana}</strong></div>
+          <div class="card-geral"><small>Feriados</small><strong>${geral.feriados}</strong></div>
+          <div class="card-geral"><small>Sem plantonista</small><strong>${geral.semPlantonista}</strong></div>
+        `;
+
+        $('resumo').innerHTML = colaboradores.map((nome) => {
+          const item = resumo[nome];
+          const total = item.total || 0;
+
+          const pctUtil = total ? (item.uteis / total) * 100 : 0;
+          const pctFds = total ? (item.finaisSemana / total) * 100 : 0;
+          const pctFeriado = total ? (item.feriados / total) * 100 : 0;
+
+          return `
+            <div class="card-colaborador">
+              <div class="nome">
+                <strong>${escapeHtml(nome)}</strong>
+                <span class="total">${total}</span>
+              </div>
+
+              <div class="linha-metrica">
+                <span>Dias úteis</span>
+                <strong>${item.uteis}</strong>
+              </div>
+
+              <div class="linha-metrica">
+                <span>Final de semana</span>
+                <strong>${item.finaisSemana}</strong>
+              </div>
+
+              <div class="linha-metrica">
+                <span>Feriados</span>
+                <strong>${item.feriados}</strong>
+              </div>
+
+              <div class="barra-distribuicao" title="Distribuição dos plantões">
+                <div class="barra-util" style="width:${pctUtil}%"></div>
+                <div class="barra-fds" style="width:${pctFds}%"></div>
+                <div class="barra-feriado" style="width:${pctFeriado}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function linhaTemConflito(linha, index, linhas) {
+        const data = linha.cells[0]?.innerText.trim() || '';
+        const semana = linha.cells[1]?.innerText.trim() || '';
+        const diaSemana = nomesSemana.indexOf(semana);
+        const feriado = !!linha.querySelector('.check-feriado')?.checked;
+        const plantonista = linha.querySelector('select.colaborador')?.value || '';
+        const horario = linha.cells[4]?.innerText.trim() || '';
+        const esperado = horarioPorDia(diaSemana, feriado);
+
+        if (!data) return true;
+        if (diaSemana === -1) return true;
+        if (!plantonista) return true;
+        if (horario !== esperado) return true;
+
+        if (plantonista && feriasNoDia(plantonista, data)) {
+          return true;
+        }
+
+        if (index > 0) {
+          const anterior = linhas[index - 1].querySelector('select.colaborador')?.value || '';
+          if (plantonista && plantonista === anterior) return true;
+        }
+
+        if (index < linhas.length - 1) {
+          const proximo = linhas[index + 1].querySelector('select.colaborador')?.value || '';
+          if (plantonista && plantonista === proximo) return true;
+        }
+
+        return false;
+      }
+
+      function atualizarConflitos() {
+        const linhas = Array.from(document.querySelectorAll('#tabela tbody tr'));
+
+        linhas.forEach((linha, index) => {
+          linha.classList.remove('linha-conflito', 'linha-ferias');
+
+          const data = linha.cells[0]?.innerText.trim() || '';
+          const plantonista = linha.querySelector('select.colaborador')?.value || '';
+
+          if (plantonista && feriasNoDia(plantonista, data)) {
+            linha.classList.add('linha-ferias');
+          }
+
+          if (linhaTemConflito(linha, index, linhas)) {
+            linha.classList.add('linha-conflito');
+          }
+        });
+      }
+
+      function pesquisar() {
+        const termo = $('pesquisa').value.trim().toLowerCase();
+        let encontrados = 0;
+
+        document.querySelectorAll('#tabela tbody tr').forEach((linha) => {
+          linha.classList.remove('linha-encontrada', 'linha-oculta', 'linha-proximo');
+
+          if (!termo) return;
+
+          const select = linha.querySelector('select.colaborador');
+
+          const texto = [
+            linha.cells[0]?.innerText || '',
+            linha.cells[1]?.innerText || '',
+            linha.querySelector('.check-feriado')?.checked ? 'feriado sim' : 'feriado nao',
+            select?.value || '',
+            linha.cells[4]?.innerText || '',
+            telefoneNoc(),
+            linha.cells[6]?.innerText || ''
+          ].join(' ').toLowerCase();
+
+          if (texto.includes(termo)) {
+            linha.classList.add('linha-encontrada');
+            encontrados++;
+          } else {
+            linha.classList.add('linha-oculta');
+          }
+        });
+
+        $('resultadoPesquisa').innerText = !termo
+          ? 'Digite algo para localizar um plantão.'
+          : encontrados === 0
+            ? 'Nenhum plantão encontrado.'
+            : `${encontrados} plantão(ões) encontrado(s).`;
+      }
+
+      function atualizarTudo() {
+        atualizarResumo();
+        atualizarConflitos();
+        pesquisar();
+      }
+
+      function aviso(msg, tipo) {
+        $('aviso').className = 'aviso ' + tipo;
+        $('aviso').innerText = msg;
+      }
+
+      function limparAviso() {
+        $('aviso').className = 'aviso';
+        $('aviso').innerText = '';
+      }
+
+      function alternarFeriado(checkbox, origem = 'manual') {
+        const linha = checkbox.closest('tr');
+        const diaSemana = diaSemanaDaLinha(linha);
+        const feriado = checkbox.checked;
+
+        aplicarClasse(linha, diaSemana, feriado);
+        linha.cells[4].innerText = horarioPorDia(diaSemana, feriado);
+
+        if (origem === 'manual') {
+          if (feriado) {
+            adicionarTextoObservacao(linha, 'Feriado manual/municipal');
+          } else {
+            removerObservacaoPorPrefixo(linha, 'Feriado manual/municipal');
+
+            const observacao = linha.cells[6]?.innerText || '';
+            const temNacional = observacao.includes('Feriado nacional:');
+
+            if (temNacional) {
+              checkbox.checked = true;
+              aplicarClasse(linha, diaSemana, true);
+              linha.cells[4].innerText = horarioPorDia(diaSemana, true);
+            }
+          }
+        }
+
+        const select = linha.querySelector('select.colaborador');
+
+        if (select) validarColaborador(select);
+
+        atualizarTudo();
+        atualizarCabecalhoPdf();
+        limparAviso();
+        salvarAutomatico();
+      }
+
+      function validarColaborador(select) {
+        const linha = select.closest('tr');
+        const nome = select.value;
+
+        if (!nome) return;
+
+        const data = linha.cells[0]?.innerText.trim() || '';
+
+        const f = feriasNoDia(nome, data);
+
+        if (f) {
+          select.value = '';
+          alert(`${nome} está de férias nesse dia (${dataIsoParaBr(f.inicio)} até ${dataIsoParaBr(f.fim)}).`);
+          return;
+        }
+
+        const anterior = linha.previousElementSibling?.querySelector('select.colaborador')?.value || '';
+        const proximo = linha.nextElementSibling?.querySelector('select.colaborador')?.value || '';
+
+        if (nome === anterior || nome === proximo) {
+          const confirmar = confirm(
+            `${nome} ficará em dois dias seguidos.\n\nDeseja manter mesmo assim?`
+          );
+
+          if (!confirmar) {
+            select.value = '';
+          }
+        }
+      }
+
+      function preencherSelects() {
+        const hoje = new Date();
+
+        $('mes').innerHTML = meses
+          .map((nome, index) => `<option value="${index}" ${index === hoje.getMonth() ? 'selected' : ''}>${nome}</option>`)
+          .join('');
+
+        $('ano').value = hoje.getFullYear();
+
+        $('feriasColaborador').innerHTML = '<option value="">Selecione</option>' + colaboradores
+          .map((nome) => `<option value="${escapeHtml(nome)}">${escapeHtml(nome)}</option>`)
+          .join('');
+
+        if (!$('nomeEscala').value.trim()) {
+          $('nomeEscala').value = nomeEscalaPadrao();
+        }
+      }
+
+      function atualizarListaFerias() {
+        $('listaFerias').innerHTML = ferias
+          .map((f, index) => `
+            <span class="ferias-item">
+              ${escapeHtml(f.nome)}: ${dataIsoParaBr(f.inicio)} até ${dataIsoParaBr(f.fim)}
+              <button type="button" data-remover-ferias="${index}">x</button>
+            </span>
+          `)
+          .join('');
+      }
+
+      function adicionarFerias() {
+        const nome = $('feriasColaborador').value;
+        const inicio = $('feriasInicio').value;
+        const fim = $('feriasFim').value;
+
+        if (!nome || !inicio || !fim) {
+          alert('Selecione o colaborador e informe início e fim das férias.');
+          return;
+        }
+
+        if (fim < inicio) {
+          alert('A data final das férias não pode ser menor que a data inicial.');
+          return;
+        }
+
+        ferias.push({ nome, inicio, fim });
+        atualizarListaFerias();
+
+        document.querySelectorAll('#tabela tbody tr').forEach((linha) => {
+          const dataIso = dataBrParaIso(linha.cells[0]?.innerText.trim() || '');
+          const select = linha.querySelector('select.colaborador');
+
+          if (select && select.value === nome && dataIso >= inicio && dataIso <= fim) {
+            select.value = '';
+
+            const obs = linha.cells[6];
+            const texto = `${nome} em férias`;
+
+            obs.innerText = obs.innerText.trim()
+              ? `${obs.innerText.trim()} | ${texto}`
+              : texto;
+          }
+        });
+
+        atualizarTudo();
+        atualizarCabecalhoPdf();
+        limparAviso();
+        salvarAutomatico();
+      }
+
+      function removerFerias(index) {
+        ferias.splice(index, 1);
+        atualizarListaFerias();
+        atualizarTudo();
+        atualizarCabecalhoPdf();
+        limparAviso();
+        salvarAutomatico();
+      }
+
+      function montarDadosEscala() {
+        const dados = {
+          versao: 14,
+          atualizadoEm: new Date().toISOString(),
+          escalaId: $('escalaId').value.trim(),
+          nomeEscala: garantirNomeEscala(),
+          titulo: $('tituloPagina').innerText.trim(),
+          mesNumero: Number($('mes').value),
+          mes: meses[Number($('mes').value)],
+          ano: Number($('ano').value),
+          setor: $('setor').value.trim() || 'NOC',
+          setorId: textoParaId($('setor').value.trim() || 'NOC'),
+          telefoneNoc: telefoneNoc(),
+          whatsappNoc: whatsappNoc(),
+          observacoes: $('observacoes').value,
+          ferias: ferias,
+          linhas: Array.from(document.querySelectorAll('#tabela tbody tr')).map((linha) => ({
+            data: linha.cells[0]?.innerText.trim() || '',
+            semana: linha.cells[1]?.innerText.trim() || '',
+            feriado: !!linha.querySelector('.check-feriado')?.checked,
+            plantonista: linha.querySelector('select.colaborador')?.value || '',
+            horario: linha.cells[4]?.innerText.trim() || '',
+            telefone: telefoneNoc(),
+            observacao: linha.cells[6]?.innerText.trim() || ''
+          }))
+        };
+
+        dados.escalaId = gerarIdEscalaMensal(dados);
+        $('escalaId').value = dados.escalaId;
+
+        return dados;
+      }
+
+      function carregarDadosEscala(dados) {
+        $('escalaId').value = dados.escalaId || '';
+        $('nomeEscala').value = dados.nomeEscala || nomeEscalaPadrao();
+        $('tituloPagina').innerText = dados.titulo || 'Admin - Escala de Plantão';
+        $('mes').value = String(dados.mesNumero ?? 0);
+        $('ano').value = dados.ano || new Date().getFullYear();
+        $('setor').value = dados.setor || 'NOC';
+        $('telefone').value = dados.telefoneNoc || '98449-1917';
+        $('observacoes').value = dados.observacoes || $('observacoes').value;
+
+        ferias = dados.ferias || [];
+        atualizarListaFerias();
+
+        bodyTabela().innerHTML = '';
+        (dados.linhas || []).forEach(montarLinha);
+
+        if ((dados.linhas || []).length) {
+          mostrarTabela();
+        } else {
+          mostrarConfiguracao();
+        }
+
+        atualizarTudo();
+        atualizarCabecalhoPdf();
+        limparAviso();
+      }
+
+      function salvarAutomatico() {
+        clearTimeout(timerSalvamento);
+
+        timerSalvamento = setTimeout(() => {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(montarDadosEscala()));
+
+          $('statusSalvamento').classList.add('ativo');
+          $('statusSalvamento').innerText = 'Alterações salvas automaticamente neste navegador.';
+
+          setTimeout(() => {
+            $('statusSalvamento').classList.remove('ativo');
+          }, 1800);
+        }, 400);
+      }
+
+      function carregarRascunho() {
+        const salvo = localStorage.getItem(STORAGE_KEY);
+
+        if (!salvo) {
+          alert('Nenhum rascunho salvo encontrado.');
+          return;
+        }
+
+        carregarDadosEscala(JSON.parse(salvo));
+        alert('Rascunho carregado.');
+      }
+
+      async function carregarEscalaAtualManual() {
+        const setor = $('setor')?.value?.trim() || 'NOC';
+        const setorId = textoParaId(setor);
+        const idAtual = `${setorId}-atual`;
+
+        const confirmar = confirm(
+          `Deseja carregar a escala atual manual deste setor?\n\nSetor: ${setor}\nID: ${idAtual}\n\nIsso vai substituir a tabela atual da tela Admin.`
+        );
+
+        if (!confirmar) return;
+
+        try {
+          const { data, error } = await supabase
+            .from('escalas')
+            .select('dados')
+            .eq('id', idAtual)
+            .maybeSingle();
+
+          if (error) {
+            console.error(error);
+            alert('Não foi possível carregar a escala atual manual.');
+            return;
+          }
+
+          if (!data || !data.dados) {
+            alert('Nenhuma escala atual manual encontrada para este setor.');
+            return;
+          }
+
+          carregarDadosEscala(data.dados);
+          salvarAutomatico();
+
+          alert('Escala atual manual carregada.');
+        } catch (erro) {
+          console.error(erro);
+          alert('Erro inesperado ao carregar a escala atual manual.');
+        }
+      }
+
+      async function salvarEscalaDoMes(mostrarMensagem = true) {
+        const dados = montarDadosEscala();
+
+        if (!dados.linhas.length) {
+          alert('Gere a tabela da escala antes de salvar.');
+          return null;
+        }
+
+        dados.atualizadoEm = new Date().toISOString();
+
+        const idEscala = gerarIdEscalaMensal(dados);
+        dados.escalaId = idEscala;
+        $('escalaId').value = idEscala;
+
+        const agora = new Date().toISOString();
+
+        const registro = {
+          id: idEscala,
+          nome: dados.nomeEscala,
+          dados: dados,
+          atualizado_em: agora
+        };
+
+        const { error } = await supabase
+          .from('escalas')
+          .upsert(registro, {
+            onConflict: 'id'
+          });
+
+        if (error) {
+          console.error(error);
+          alert('Erro ao salvar a escala do mês. Verifique as políticas do Supabase.');
+          return null;
+        }
+
+        salvarAutomatico();
+        await carregarHistorico();
+
+        if (mostrarMensagem) {
+          alert(
+            `Escala do mês salva com sucesso.\n\nID: ${idEscala}\n\nEla aparecerá automaticamente para os plantonistas quando chegar esse mês.`
+          );
+        }
+
+        return {
+          id: idEscala,
+          dados: dados,
+          atualizadoEm: agora
+        };
+      }
+
+      async function publicarComoAtualAgora() {
+        if (!bodyTabela().rows.length) {
+          alert('Gere a tabela da escala antes de forçar como atual.');
+          return;
+        }
+
+        const dados = montarDadosEscala();
+        const idEscala = gerarIdEscalaMensal(dados);
+        const idAtual = gerarIdEscalaAtual(dados);
+
+        const confirmar = confirm(
+          `ATENÇÃO!\n\nVocê está prestes a FORÇAR esta escala como atual agora.\n\n` +
+          `Escala: ${dados.nomeEscala}\n` +
+          `Setor: ${dados.setor}\n` +
+          `Mês/Ano: ${dados.mes}/${dados.ano}\n` +
+          `ID mensal: ${idEscala}\n` +
+          `ID atual manual: ${idAtual}\n\n` +
+          `Isso fará essa escala aparecer imediatamente no user.html deste setor, mesmo que ainda não seja o mês dela.\n\n` +
+          `Deseja continuar?`
+        );
+
+        if (!confirmar) return;
+
+        const confirmarNovamente = confirm(
+          'Confirme novamente:\n\nDeseja realmente substituir a escala atual manual por esta escala?'
+        );
+
+        if (!confirmarNovamente) return;
+
+        const salvo = await salvarEscalaDoMes(false);
+
+        if (!salvo) return;
+
+        const { error } = await supabase
+          .from('escalas')
+          .upsert({
+            id: idAtual,
+            nome: salvo.dados.nomeEscala,
+            dados: salvo.dados,
+            atualizado_em: new Date().toISOString()
+          }, {
+            onConflict: 'id'
+          });
+
+        if (error) {
+          console.error(error);
+          alert('Erro ao publicar como atual agora. Verifique as políticas do Supabase.');
+          return;
+        }
+
+        await carregarHistorico();
+
+        alert('Escala publicada como atual agora.');
+      }
+
+      async function publicarHistoricoComoAtual(id) {
+        const confirmar = confirm('Deseja publicar esta escala do histórico como atual agora?');
+
+        if (!confirmar) return;
+
+        const { data, error } = await supabase
+          .from('escalas')
+          .select('dados, nome')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (error || !data || !data.dados) {
+          console.error(error);
+          alert('Não foi possível carregar a escala do histórico.');
+          return;
+        }
+
+        const idAtual = gerarIdEscalaAtual(data.dados);
+
+        const confirmarNovamente = confirm(
+          `Confirme a publicação manual:\n\n` +
+          `Escala: ${data.nome || data.dados.nomeEscala || id}\n` +
+          `ID atual manual: ${idAtual}\n\n` +
+          `Deseja realmente publicar como atual agora?`
+        );
+
+        if (!confirmarNovamente) return;
+
+        const { error: erroPublicar } = await supabase
+          .from('escalas')
+          .upsert({
+            id: idAtual,
+            nome: data.nome || data.dados.nomeEscala || id,
+            dados: data.dados,
+            atualizado_em: new Date().toISOString()
+          }, {
+            onConflict: 'id'
+          });
+
+        if (erroPublicar) {
+          console.error(erroPublicar);
+          alert('Erro ao publicar a escala como atual.');
+          return;
+        }
+
+        await carregarHistorico();
+
+        alert('Escala publicada como atual agora.');
+      }
+
+      async function abrirEscalaHistorico(id) {
+        const confirmar = confirm('Deseja abrir esta escala na tela de edição?');
+
+        if (!confirmar) return;
+
+        const { data, error } = await supabase
+          .from('escalas')
+          .select('dados')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (error || !data || !data.dados) {
+          console.error(error);
+          alert('Não foi possível abrir a escala.');
+          return;
+        }
+
+        carregarDadosEscala(data.dados);
+        salvarAutomatico();
+
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }
+
+      async function carregarHistorico() {
+        try {
+          $('historicoLista').innerHTML = '<div class="vazio">Carregando histórico...</div>';
+
+          const { data, error } = await supabase
+            .from('escalas')
+            .select('id, nome, dados, atualizado_em')
+            .like('id', '%-%')
+            .order('atualizado_em', {
+              ascending: false
+            });
+
+          if (error) {
+            console.error(error);
+            $('historicoLista').innerHTML = '<div class="vazio">Não foi possível carregar o histórico.</div>';
+            return;
+          }
+
+          const registros = (data || []).filter((item) => !item.id.endsWith('-atual'));
+
+          if (!registros.length) {
+            $('historicoLista').innerHTML = '<div class="vazio">Nenhuma escala salva ainda.</div>';
+            return;
+          }
+
+          $('historicoLista').innerHTML = registros.map((item) => {
+            const dados = item.dados || {};
+            const nome = item.nome || dados.nomeEscala || item.id;
+            const mesAno = `${dados.mes || '-'} / ${dados.ano || '-'}`;
+            const setor = dados.setor || '-';
+            const atualizado = item.atualizado_em ? new Date(item.atualizado_em).toLocaleString('pt-BR') : '-';
+
+            return `
+              <div class="historico-card">
+                <div class="historico-info">
+                  <strong>${escapeHtml(nome)}</strong>
+                  <span>Setor: ${escapeHtml(setor)}</span>
+                  <span>ID: ${escapeHtml(item.id)}</span>
+                  <span>Mês/Ano: ${escapeHtml(mesAno)}</span>
+                  <span>Atualizado em: ${escapeHtml(atualizado)}</span>
+                </div>
+
+                <div class="historico-acoes">
+                  <button class="btn-secundario" type="button" data-abrir-historico="${escapeHtml(item.id)}">Abrir</button>
+                  <button class="btn-verde" type="button" data-publicar-historico="${escapeHtml(item.id)}">Publicar atual</button>
+                </div>
+              </div>
+            `;
+          }).join('');
+        } catch (erro) {
+          console.error(erro);
+          $('historicoLista').innerHTML = '<div class="vazio">Erro inesperado ao carregar o histórico.</div>';
+        }
+      }
+
+      async function despublicarEscala() {
+        const dados = montarDadosEscala();
+        const idAtual = gerarIdEscalaAtual(dados);
+
+        const confirmar = confirm(
+          `Tem certeza que deseja remover a escala atual manual?\n\n` +
+          `Setor: ${dados.setor}\n` +
+          `ID: ${idAtual}\n\n` +
+          `Isso remove apenas o registro atual manual.\nAs escalas mensais salvas continuarão no histórico.`
+        );
+
+        if (!confirmar) return;
+
+        const confirmarNovamente = confirm(
+          'Confirme novamente: deseja remover a escala atual manual?'
+        );
+
+        if (!confirmarNovamente) return;
+
+        try {
+          const { error } = await supabase
+            .from('escalas')
+            .delete()
+            .eq('id', idAtual);
+
+          if (error) {
+            console.error(error);
+            alert('Erro ao remover a escala atual manual. Verifique as políticas do Supabase.');
+            return;
+          }
+
+          await carregarHistorico();
+
+          alert('Escala atual manual removida com sucesso. O histórico mensal foi preservado.');
+        } catch (erro) {
+          console.error(erro);
+          alert('Erro inesperado ao remover a escala atual manual.');
+        }
+      }
+
+      function baixarArquivo(nome, conteudo, tipo) {
+        const blob = new Blob([conteudo], { type: tipo });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+
+        a.href = url;
+        a.download = nome;
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+      }
+
+      function exportarCsv() {
+        const dados = montarDadosEscala();
+
+        if (!dados.linhas.length) {
+          alert('Gere a tabela da escala antes de exportar CSV.');
+          return;
+        }
+
+        const linhas = [['Data', 'Semana', 'Feriado', 'Plantonista', 'Horario', 'Telefone', 'Observacao']];
+
+        dados.linhas.forEach((item) => {
+          linhas.push([
+            item.data,
+            item.semana,
+            item.feriado ? 'Sim' : 'Não',
+            item.plantonista,
+            item.horario,
+            item.telefone,
+            item.observacao
+          ]);
+        });
+
+        const csv = linhas
+          .map((linha) => linha.map((valor) => `"${String(valor).replaceAll('"', '""')}"`).join(';'))
+          .join('\n');
+
+        baixarArquivo(`escala-plantao-${dados.setorId}-${dados.mes}-${dados.ano}.csv`, '\ufeff' + csv, 'text/csv;charset=utf-8');
+      }
+
+      function baixarPdf() {
+        if (!bodyTabela().rows.length) {
+          alert('Gere a tabela da escala antes de baixar o PDF.');
+          return;
+        }
+
+        atualizarCabecalhoPdf();
+        window.print();
+      }
+
+      function verificarEscala() {
+        const dados = montarDadosEscala();
+        const problemas = [];
+
+        if (!dados.linhas.length) {
+          aviso('Nenhuma escala foi gerada.', 'erro');
+          return;
+        }
+
+        const totalDias = new Date(dados.ano, dados.mesNumero + 1, 0).getDate();
+
+        if (dados.linhas.length !== totalDias) {
+          problemas.push(`A escala tem ${dados.linhas.length} linha(s), mas o mês tem ${totalDias} dia(s).`);
+        }
+
+        dados.linhas.forEach((linha, index) => {
+          const diaSemana = nomesSemana.indexOf(linha.semana);
+          const esperado = horarioPorDia(diaSemana, linha.feriado);
+
+          if (!linha.data) problemas.push(`Linha ${index + 1}: data em branco.`);
+          if (diaSemana === -1) problemas.push(`${linha.data || 'Linha ' + (index + 1)}: dia da semana inválido.`);
+          if (!linha.plantonista) problemas.push(`${linha.data || 'Linha ' + (index + 1)}: sem plantonista.`);
+          if (linha.horario !== esperado) problemas.push(`${linha.data}: horário deveria ser ${esperado}.`);
+
+          if (linha.plantonista && feriasNoDia(linha.plantonista, linha.data)) {
+            problemas.push(`${linha.data}: ${linha.plantonista} está de férias.`);
+          }
+
+          if (index > 0 && linha.plantonista && linha.plantonista === dados.linhas[index - 1].plantonista) {
+            problemas.push(`${dados.linhas[index - 1].data} e ${linha.data}: ${linha.plantonista} está em dois dias seguidos.`);
+          }
+        });
+
+        atualizarConflitos();
+
+        aviso(
+          problemas.length
+            ? '⚠️ Verifique:\n\n' + problemas.join('\n')
+            : '✅ Escala verificada: nenhum problema encontrado.',
+          problemas.length ? 'erro' : 'ok'
+        );
+      }
+
+      function proximoPlantao() {
+        $('pesquisa').value = '';
+        pesquisar();
+
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+
+        let encontrada = null;
+
+        Array.from(document.querySelectorAll('#tabela tbody tr')).some((linha) => {
+          linha.classList.remove('linha-proximo');
+
+          const data = dataBrParaDate(linha.cells[0]?.innerText.trim() || '');
+          if (!data) return false;
+
+          data.setHours(0, 0, 0, 0);
+
+          if (data >= hoje) {
+            encontrada = linha;
+            return true;
+          }
+
+          return false;
+        });
+
+        if (!encontrada) {
+          alert('Nenhum próximo plantão encontrado nesta escala.');
+          return;
+        }
+
+        encontrada.classList.add('linha-proximo');
+        encontrada.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const select = encontrada.querySelector('select.colaborador');
+
+        $('resultadoPesquisa').innerText =
+          `Próximo plantão: ${encontrada.cells[0].innerText.trim()} (${encontrada.cells[1].innerText.trim()}) - ${select.value || 'sem plantonista'} - ${encontrada.cells[4].innerText.trim()}`;
+      }
+
+      function limparTabela() {
+        if (!confirm('Tem certeza que deseja limpar a tabela da tela? O histórico salvo no Supabase não será apagado.')) return;
+
+        bodyTabela().innerHTML = '';
+        $('painelTabela').classList.add('oculto');
+        atualizarTudo();
+        limparAviso();
+        salvarAutomatico();
+        mostrarConfiguracao();
+      }
+
+      function alternarTabela() {
+        const wrapper = $('tabelaWrapper');
+        const botao = $('btnAlternarTabela');
+        const recolhida = wrapper.classList.toggle('recolhida');
+
+        botao.innerText = recolhida ? 'Mostrar tabela' : 'Minimizar tabela';
+      }
+
+      function ligarEventos() {
+        $('btnEntrarAdmin').onclick = entrarAdmin;
+        $('btnMostrarSenha').onclick = alternarMostrarSenha;
+
+        $('senhaAdmin').addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') entrarAdmin();
+        });
+
+        $('salvarSenhaAdmin').addEventListener('change', () => {
+          if (!$('salvarSenhaAdmin').checked) {
+            localStorage.removeItem(SENHA_SALVA_KEY);
+          }
+        });
+
+        carregarSenhaSalva();
+        verificarLoginSalvo();
+
+        if (sessionStorage.getItem(LOGIN_KEY) === 'sim') {
+          carregarHistorico();
+        }
+
+        $('btnNovaEscala').onclick = novaEscala;
+        $('btnGerar').onclick = gerarEscala;
+        $('btnSalvarMes').onclick = () => salvarEscalaDoMes(true);
+        $('btnPublicarAtual').onclick = publicarComoAtualAgora;
+        $('btnDespublicar').onclick = despublicarEscala;
+        $('btnFeriados').onclick = () => buscarFeriadosNacionais(true);
+        $('btnVerificar').onclick = verificarEscala;
+        $('btnProximo').onclick = proximoPlantao;
+        $('btnResumo').onclick = atualizarResumo;
+        $('btnCarregarAtual').onclick = carregarEscalaAtualManual;
+        $('btnCarregar').onclick = carregarRascunho;
+        $('btnBaixarPdf').onclick = baixarPdf;
+        $('btnExportarCsv').onclick = exportarCsv;
+        $('btnAlternarTabela').onclick = alternarTabela;
+        $('btnLimpar').onclick = limparTabela;
+        $('btnAdicionarFerias').onclick = adicionarFerias;
+        $('btnHistorico').onclick = carregarHistorico;
+        $('btnAtualizarHistorico2').onclick = carregarHistorico;
+
+        $('historicoLista').onclick = (event) => {
+          const abrirId = event.target.getAttribute('data-abrir-historico');
+          const publicarId = event.target.getAttribute('data-publicar-historico');
+
+          if (abrirId) abrirEscalaHistorico(abrirId);
+          if (publicarId) publicarHistoricoComoAtual(publicarId);
+        };
+
+        $('btnLimparPesquisa').onclick = () => {
+          $('pesquisa').value = '';
+          pesquisar();
+        };
+
+        $('pesquisa').oninput = pesquisar;
+
+        $('telefone').oninput = () => {
+          document.querySelectorAll('#tabela tbody tr').forEach((linha) => {
+            linha.cells[5].innerHTML = telefoneHtml();
+          });
+
+          atualizarTudo();
+          atualizarCabecalhoPdf();
+          salvarAutomatico();
+        };
+
+        ['nomeEscala', 'mes', 'ano', 'setor', 'observacoes'].forEach((id) => {
+          $(id).addEventListener('input', () => {
+            atualizarCabecalhoPdf();
+            salvarAutomatico();
+          });
+
+          $(id).addEventListener('change', () => {
+            atualizarCabecalhoPdf();
+            salvarAutomatico();
+          });
+        });
+
+        $('tituloPagina').addEventListener('input', salvarAutomatico);
+
+        $('listaFerias').onclick = (event) => {
+          const index = event.target.getAttribute('data-remover-ferias');
+          if (index !== null) removerFerias(Number(index));
+        };
+
+        bodyTabela().addEventListener('change', (event) => {
+          if (event.target.classList.contains('check-feriado')) alternarFeriado(event.target, 'manual');
+
+          if (event.target.classList.contains('colaborador')) {
+            validarColaborador(event.target);
+            atualizarTudo();
+            atualizarCabecalhoPdf();
+            limparAviso();
+            salvarAutomatico();
+          }
+        });
+
+        bodyTabela().addEventListener('input', () => {
+          atualizarTudo();
+          atualizarCabecalhoPdf();
+          salvarAutomatico();
+        });
+      }
+
+      preencherSelects();
+      atualizarListaFerias();
+      ligarEventos();
+      atualizarTudo();
+    })();
+  </script>
+</body>
+</html>
